@@ -54,7 +54,7 @@ def get_hrefs(
         equal to 'item-title' in the HTML of the page at the given URL.
     '''
     assert sleep_time >= 0
-    assert proxy_type in ['proxy_crawl', 'rapid_api']
+    assert proxy_type in ['proxy_crawl', 'rapid_api', 'no_proxy', None]
 
     if proxy_type == 'rapid_api':
         driver = webdriver.Chrome(desired_capabilities = get_rapid_api_proxy())
@@ -62,6 +62,9 @@ def get_hrefs(
     elif proxy_type == 'proxy_crawl':
         driver = webdriver.Chrome()
         driver.get(proxy_crawl_proxy(url))
+    elif proxy_type in ['no_proxy', None]:
+        driver = webdriver.Chrome()
+        driver.get(url)
 
     time.sleep(sleep_time)
 
