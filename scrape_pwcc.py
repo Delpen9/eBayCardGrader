@@ -1,7 +1,40 @@
+import numpy as np
+
 import time
 from bs4 import BeautifulSoup
+
 from selenium import webdriver
-import numpy as np
+from selenium.webdriver.common.proxy import Proxy, ProxyType
+from selenium.webdriver.chrome.options import Options
+
+import requests
+import json
+
+def get_rapid_api_proxy() -> object:
+    url = 'https://ephemeral-proxies.p.rapidapi.com/v2/datacenter/proxy'
+
+    headers = {
+        'X-RapidAPI-Key': '0c389d3804msh2abc3d364336e47p1884c4jsnac439d6e6e0f',
+        'X-RapidAPI-Host': 'ephemeral-proxies.p.rapidapi.com'
+    }
+
+    response = requests.request('GET', url, headers = headers)
+    response_dict = json.loads(response.text)
+
+    hostname = response_dict['proxy']['host']
+    port = response_dict['proxy']['port']
+
+    proxy_ip_port = fr'{hostname}:{port}'
+
+    proxy = Proxy()
+    proxy.proxy_type = ProxyType.MANUAL
+    proxy.http_proxy = proxy_ip_port
+    proxy.ssl_proxy = proxy_ip_port
+
+    capabilities = webdriver.DesiredCapabilities.CHROME
+    proxy.add_to_capabilities(capabilities)
+
+    return capabilities
 
 def get_hrefs(
     url : str,
@@ -12,7 +45,7 @@ def get_hrefs(
         Given a URL, this function returns a list of URLs for all `a` elements that have an `data-testid` attribute
         equal to 'item-title' in the HTML of the page at the given URL.
     '''
-    driver = webdriver.Chrome()
+    driver = webdriver.Chrome(desired_capabilities = get_rapid_api_proxy())
     driver.get(url)
 
     time.sleep(sleep_time)
@@ -22,12 +55,14 @@ def get_hrefs(
     for link in links:
         hrefs.append(link.get_attribute('href'))
 
+    driver.quit()
+
     return hrefs
 
 def get_all_img_hrefs(
     base_url : str,
     sample_limit : int = 125,
-    sleep_time : int = 120
+    sleep_time : int = 10
 ) -> list:
     '''
     get_all_img_hrefs():
