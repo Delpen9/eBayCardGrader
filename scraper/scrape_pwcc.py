@@ -14,7 +14,7 @@ def get_rapid_api_proxy() -> object:
     url = 'https://ephemeral-proxies.p.rapidapi.com/v2/datacenter/proxy'
 
     headers = {
-        'X-RapidAPI-Key': '0c389d3804msh2abc3d364336e47p1884c4jsnac439d6e6e0f',
+        'X-RapidAPI-Key': '',
         'X-RapidAPI-Host': 'ephemeral-proxies.p.rapidapi.com'
     }
 
@@ -38,7 +38,7 @@ def get_rapid_api_proxy() -> object:
 
 def proxy_crawl_proxy(
     url : str,
-    javascript_token : str = 'B9P6eNDR3sl1PFpPnp0KXw'
+    javascript_token : str = ''
 ):
     proxy_crawl_url = f'https://api.crawlbase.com/?token={javascript_token}&url={url}&format=json'
     return proxy_crawl_url
