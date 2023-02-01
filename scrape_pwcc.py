@@ -1,23 +1,27 @@
 import time
-import requests
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 
-def get_img_urls(
+def get_hrefs(
     url : str
 ) -> list:
     '''
-    get_img_urls():
-        Given a URL, this function returns a list of URLs for all `img` elements that have an `alt` attribute
-        ending with 'Back' in the HTML of the page at the given URL.
+    get_hrefs():
+        Given a URL, this function returns a list of URLs for all `a` elements that have an `data-testid` attribute
+        equal to 'item-title' in the HTML of the page at the given URL.
     '''
-    res = requests.get(url)
+    driver = webdriver.Chrome()
+    driver.get(url)
 
     time.sleep(10)
 
-    soup = BeautifulSoup(res.text, 'html.parser')
-    img_tags = soup.find_all('img')
-    urls = [img['src'] for img in img_tags if img.has_attr('alt') and img['alt'].endswith('Back')]
-    return urls
+    links = driver.find_elements("xpath", "//a[@data-testid='item-title']")
+    hrefs = []
+    for link in links:
+        hrefs.append(link.get_attribute('href'))
+
+    return hrefs
 
 def get_all_img_urls(
     base_url : str
@@ -31,10 +35,10 @@ def get_all_img_urls(
     page = 1
     while True:
         page_url = fr'{base_url}&page={str(page)}'
-        page_img_urls = get_img_urls(page_url)
+        page_img_urls = get_hrefs(page_url)
         if not page_img_urls:
             break
-        urls.extend(page_img_urls)
+        urls += page_img_urls
         page += 1
     return urls
 
