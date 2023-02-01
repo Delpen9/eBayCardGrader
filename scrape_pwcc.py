@@ -36,17 +36,32 @@ def get_rapid_api_proxy() -> object:
 
     return capabilities
 
+def proxy_crawl_proxy(
+    url : str,
+    javascript_token : str = 'B9P6eNDR3sl1PFpPnp0KXw'
+):
+    proxy_crawl_url = f'https://api.crawlbase.com/?token={javascript_token}&url={url}&format=json'
+    return proxy_crawl_url
+
 def get_hrefs(
     url : str,
-    sleep_time : int = 10
+    sleep_time : int = 10,
+    proxy_type : str = 'proxy_crawl' #rapid_api
 ) -> list:
     '''
     get_hrefs():
         Given a URL, this function returns a list of URLs for all `a` elements that have an `data-testid` attribute
         equal to 'item-title' in the HTML of the page at the given URL.
     '''
-    driver = webdriver.Chrome(desired_capabilities = get_rapid_api_proxy())
-    driver.get(url)
+    assert sleep_time >= 0
+    assert proxy_type in ['proxy_crawl', 'rapid_api']
+
+    if proxy_type == 'rapid_api':
+        driver = webdriver.Chrome(desired_capabilities = get_rapid_api_proxy())
+        driver.get(url)
+    elif proxy_type == 'proxy_crawl':
+        driver = webdriver.Chrome()
+        driver.get(proxy_crawl_proxy(url))
 
     time.sleep(sleep_time)
 
